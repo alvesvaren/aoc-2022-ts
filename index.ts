@@ -94,7 +94,7 @@ program
     const day: string = options.day;
     const [part1, part2] = await runSolution(parseInt(day));
     part1 !== undefined && console.log(chalk.cyanBright('Part 1:'), part1);
-    part2 !== undefined ?? console.log(chalk.cyanBright('Part 2:'), part2);
+    part2 !== undefined && console.log(chalk.cyanBright('Part 2:'), part2);
     if (!(part1 ?? part2)) {
       console.log(chalk.yellowBright('No output'));
     }

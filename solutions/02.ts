@@ -1,11 +1,6 @@
 type Mapping<T> = { [key: string]: T };
 
 export default function (data: string) {
-  // A and X is rock, B and Y is paper, C and Z is scissors
-  // Winning combinations are A vs Y, B vs Z, C vs X
-  // Winning by rock gives you 1 point, paper 2 points, scissors 3 points
-  // Drawing gives you 3 points
-
   const winner: Mapping<string> = {
     A: 'Y',
     B: 'Z',
@@ -25,20 +20,48 @@ export default function (data: string) {
   };
 
   const rounds = data.trim().split('\n');
-
-  let score = 0;
+  let score1 = 0;
 
   rounds.forEach(round => {
     const [opponent, play] = round.split(' ');
-    score += scores[play];
+    score1 += scores[play];
     if (play === winner[opponent]) {
-      score += 6;
+      score1 += 6;
     }
 
     if (play === draw[opponent]) {
-      score += 3;
+      score1 += 3;
     }
   });
 
-  return [score, 0];
+  let score2 = 0;
+
+  const loosing: Mapping<string> = {
+    A: 'Z',
+    B: 'X',
+    C: 'Y',
+  };
+
+  rounds.forEach(round => {
+    const [opponent, result] = round.split(' ');
+    let pick: string;
+    switch (result) {
+    case 'X': // Lose
+      pick = loosing[opponent];
+      score2 += scores[pick];
+      break;
+    case 'Y': // Draw
+      score2 += 3;
+      pick = draw[opponent];
+      score2 += scores[pick];
+      break;
+    case 'Z': // Win
+      score2 += 6;
+      pick = winner[opponent];
+      score2 += scores[pick];
+      break;
+    }
+  });
+
+  return [score1, score2];
 }
