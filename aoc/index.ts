@@ -1,6 +1,7 @@
 import axios from 'axios';
 import 'dotenv/config';
 import fs from 'fs/promises';
+import { JSDOM } from 'jsdom';
 import path from 'path';
 import Turndown from 'turndown';
 const session = process.env.SESSION;
@@ -56,4 +57,43 @@ export const getMarkdown = async (day: number) => {
   const turndown = new Turndown();
   const html = await getHtml(day);
   return turndown.turndown(html);
+};
+
+export const getStarCount = async (day: number) => {
+  const { data } = await client.get(`/day/${day}`);
+  const {
+    window: { document: dom },
+  } = new JSDOM(data);
+  const hasStars = !!dom.querySelector('.day-success');
+  const hasForm = !!dom.querySelector('form');
+
+  return hasForm ? (hasStars ? 1 : 0) : 2;
+};
+
+export const submit = async (day: number, part: 1 | 2, answer: unknown) => {
+  const formData = new URLSearchParams();
+  formData.append('level', part + '');
+  formData.append('answer', answer + '');
+  console.log(formData.toString());
+  const { data }: { data: string } = await client.post(
+    `/day/${day}/answer`,
+    formData.toString(),
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    }
+  );
+
+  const {
+    window: { document: dom },
+  } = new JSDOM(data);
+
+  const message = dom
+    .querySelector('article')
+    ?.textContent?.replace(/\[Return .+\]/, '');
+
+  const correct = !!data.match(/That's the right answer!/);
+
+  return { message, correct };
 };

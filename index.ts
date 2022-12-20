@@ -1,7 +1,14 @@
 import chalk from 'chalk';
 import { program } from 'commander';
 import fs from 'fs/promises';
-import { cacheAvailable, getInput, getMarkdown } from './aoc/index.js';
+import prompt from 'prompt';
+import {
+  cacheAvailable,
+  getInput,
+  getMarkdown,
+  getStarCount,
+  submit,
+} from './aoc/index.js';
 
 type RunFunction = (input: string) => [unknown, unknown] | undefined | string;
 type PartFunction = (input: string) => unknown;
@@ -103,6 +110,7 @@ program
     if (testsPart1 || testsPart2) console.log();
 
     const logTests = async (tests: typeof testsPart1, part: 0 | 1) => {
+      let anyFailed = false;
       if (tests) {
         for (const test of tests) {
           const solution = (await runSolution(parseInt(day), test.in))[part];
@@ -112,20 +120,48 @@ program
               `  ${solution} ${passed ? '==' : '!='} ${test.out}`
             )
           );
+
+          if (!passed) {
+            anyFailed = true;
+          }
         }
       }
+
+      return anyFailed;
     };
+
+    const askSubmit = async (part: 1 | 2) => {
+      prompt.start({
+        message: `Submit part ${part}? (y/n)`,
+      });
+      prompt.get([`part${part}`], async (_, res) => {
+        if (res[`part${part}`] === 'y') {
+          const { correct, message } = await submit(parseInt(day), part, part1);
+          console.log(
+            chalk[correct ? 'greenBright' : 'redBright'](
+              message?.replaceAll('  ', '\n')
+            )
+          );
+        }
+      });
+    };
+
+    const stars = await getStarCount(parseInt(day));
+
+    console.log(chalk.yellowBright(`You have ${stars} stars on day ${day}\n`));
 
     if (testsPart1) {
       console.log(chalk.greenBright('Part 1 tests:'));
-      await logTests(testsPart1, 0);
+      const testFailed = await logTests(testsPart1, 0);
+      if (!testFailed && stars < 1) await askSubmit(1);
     }
 
     if (testsPart1 && testsPart2) console.log();
 
     if (testsPart2) {
       console.log(chalk.greenBright('Part 2 tests:'));
-      await logTests(testsPart2, 1);
+      const testFailed = await logTests(testsPart2, 1);
+      if (!testFailed && stars < 2) await askSubmit(2);
     }
   });
 
@@ -149,6 +185,15 @@ program
     } else {
       console.log(markdown);
     }
+  });
+
+program
+  .command('status')
+  .requiredOption('-d, --day <day>', 'The day to run')
+  .action(async options => {
+    const day: string = options.day;
+    const days = await getStarCount(parseInt(day));
+    console.log(days);
   });
 
 program.parse();
