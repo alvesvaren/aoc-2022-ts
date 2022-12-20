@@ -1,14 +1,15 @@
 {
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true,
-        "source.organizeImports": true
-    },
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
-    "[dotenv]": {
-        "editor.defaultFormatter": "foxundermoon.shell-format"
-    },
-    "[ignore]": {
-        "editor.defaultFormatter": "foxundermoon.shell-format"
-    }
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.organizeImports": true
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+  "[dotenv]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[ignore]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "editor.tabSize": 2
 }
