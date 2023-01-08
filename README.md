@@ -18,7 +18,7 @@ Features:
 
 1. Clone the repo
 1. Run `yarn` in the repo
-1. Create .env.local-file with content
+1. Create .env-file with content
    ```ini
    YEAR=2022
    SESSION=<your-session-cookie>
